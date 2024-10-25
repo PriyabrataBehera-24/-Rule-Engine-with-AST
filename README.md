@@ -1,133 +1,181 @@
 # AST Rule Engine
 
-A Python-based rule engine application utilizing Flask and Tkinter for dynamic rule management and evaluation.
-
-## Table of Contents
-- [Features](#features)
-- [Setup](#setup)
-- [Components](#components)
-- [App Components](#app-components)
-- [API Endpoints](#api-endpoints)
-- [Sample Curl Workflow](#sample-curl-workflow)
-- [Testing](#testing)
-- [Non-Functional Requirements](#non-functional-requirements)
+A powerful and flexible Abstract Syntax Tree (AST) based rule engine that allows users to create, combine, evaluate, and manage complex business rules through both API and GUI interfaces.
 
 ## Features
-- **Dynamic Rule Management:** Create, combine, and evaluate rules through an intuitive Tkinter UI.
-- **Automated Testing:** A dedicated script to verify the functionality of the rule engine.
-- **RESTful APIs:** Access rule functionalities via well-defined API endpoints.
 
-## Setup
+- ✨ **Dynamic rule creation and management**
+- 🔄 **Rule combination** with logical operators (AND, OR)
+- 📊 **Real-time rule evaluation**
+- 🎯 **Support for multiple data types**
+- 🖥️ **User-friendly GUI interface**
+- 🔌 **RESTful API endpoints**
+- 💾 **Persistent storage with SQLite**
 
-### Install the Required Dependencies:
-Run the following command to install the necessary libraries:
-```bash
-pip install flask sqlalchemy
-```
+## Installation
 
-### Start the Flask Application:
-Execute the command below to launch the application:
+### Prerequisites
+
+- **Python 3.8+**
+- **pip** package manager
+
+### Setup
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/yourusername/ast-rule-engine.git
+   cd ast-rule-engine
+   ```
+
+2. **Create a virtual environment (recommended):**
+
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies:**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+## Usage
+
+### Starting the Server
+
+Run the main application server:
+
 ```bash
 python main.py
 ```
 
-## Components
-- **Backend:** `main.py` (Flask, SQLAlchemy)
-- **Frontend:** `rlg.py` (Tkinter)
-- **Testing:** `test.py` (Requests for automated testing)
+The server will start at `http://localhost:5000`.
 
-## App Components
-- **Create Rule:** Define a new rule and display its ID within the UI.
-- **Combine Rules:** Merge multiple rule IDs into a single "mega rule" with its own unique ID.
-- **Evaluate Rule:** Test the combined rule using specified JSON data.
+### Running the GUI
+
+Launch the GUI interface:
+
+```bash
+python tinker.py
+```
 
 ## API Endpoints
 
-### Create Rule
-- **Endpoint:** `/create_rule`
-- **Method:** POST
-- **Data Example:**
-```json
-{ "rule_string": "(age > 30 AND department = 'Sales') OR (salary > 50000)" }
-```
-- **Expected Response:**
-```json
-{ "id": 1, "ast": "..." }
-```
+- **Create Rule**
 
-### Combine Rules
-- **Endpoint:** `/combine_rules`
-- **Method:** POST
-- **Data Example:**
-```json
-{ "rule_ids": [1, 2] }
-```
-- **Expected Response:**
-```json
-{ "id": 3, "combined_ast": "..." }
-```
+   ```http
+   POST /rules
+   Content-Type: application/json
+   ```
 
-### Evaluate Rule
-- **Endpoint:** `/evaluate_rule`
-- **Method:** POST
-- **Data Example:**
-```json
-{ "rule_id": 3, "data": { "age": 35, "department": "Sales", "salary": 60000, "experience": 6 } }
-```
-- **Expected Response:**
-```json
-{ "result": true }
-```
+   **Sample Request Body:**
 
-### Modify Rule
-- **Endpoint:** `/modify_rule`
-- **Method:** POST
-- **Data Example:**
-```json
-{ "rule_id": 1, "new_rule_string": "age > 40 AND department = 'HR'" }
-```
-- **Expected Response:**
-```json
-{ "message": "Rule updated successfully" }
-```
+   ```json
+   {
+       "field": "age",
+       "operator": ">",
+       "value": 18
+   }
+   ```
 
-## Sample Curl Workflow
-Here’s a practical example demonstrating the API usage via curl commands:
+- **Combine Rules**
 
-1. **Creating the First Rule:**
-```bash
-curl -X POST http://127.0.0.1:5000/create_rule -H "Content-Type: application/json" -d '{"rule_string": "(age > 30 AND department = 'Sales') OR (salary > 50000)"}'
-```
+   ```http
+   POST /combine
+   Content-Type: application/json
+   ```
 
-2. **Creating the Second Rule:**
-```bash
-curl -X POST http://127.0.0.1:5000/create_rule -H "Content-Type: application/json" -d '{"rule_string": "(experience > 5 AND department = 'Marketing')"}'
-```
+   **Sample Request Body:**
 
-3. **Combining Rules (use actual IDs from the previous steps):**
-```bash
-curl -X POST http://127.0.0.1:5000/combine_rules -H "Content-Type: application/json" -d '{"rule_ids": [1, 2]}'
-```
+   ```json
+   {
+       "rule1_id": 1,
+       "rule2_id": 2,
+       "operator": "AND"
+   }
+   ```
 
-4. **Evaluating the Combined Rule (replace with the combined rule ID):**
-```bash
-curl -X POST http://127.0.0.1:5000/evaluate_rule -H "Content-Type: application/json" -d '{"rule_id": 3, "data": {"age": 35, "department": "Sales", "salary": 60000, "experience": 6}}'
-```
+- **Evaluate Rule**
 
-5. **Modifying an Existing Rule (replace with the rule ID you wish to change):**
-```bash
-curl -X POST http://127.0.0.1:5000/modify_rule -H "Content-Type: application/json" -d '{"rule_id": 1, "new_rule_string": "age > 40 AND department = 'HR'"}'
+   ```http
+   POST /evaluate
+   Content-Type: application/json
+   ```
+
+   **Sample Request Body:**
+
+   ```json
+   {
+       "rule_id": 1,
+       "data": {
+           "age": 25,
+           "name": "John"
+       }
+   }
+   ```
+
+- **Modify Rule**
+
+   ```http
+   PUT /rules/<rule_id>
+   Content-Type: application/json
+   ```
+
+   **Sample Request Body:**
+
+   ```json
+   {
+       "field": "age",
+       "operator": ">=",
+       "value": 21
+   }
+   ```
+
+## GUI Interface
+
+The GUI provides intuitive access to all functionalities, including:
+
+- **Rule Creation Panel**
+- **Rule Combination Interface**
+- **Rule Evaluation Window**
+- **Rule Management Dashboard**
+
+## Database Schema
+
+The following schema is used to store rules in SQLite:
+
+```sql
+CREATE TABLE rules (
+    id INTEGER PRIMARY KEY,
+    field TEXT NOT NULL,
+    operator TEXT NOT NULL,
+    value TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 ```
 
 ## Testing
-To validate the functionality of the rule engine, run the `test.py` script:
+
+Run the test suite:
+
 ```bash
 python test.py
 ```
-This script performs automated tests for rule creation, combination, evaluation, and modification.
 
-## Non-Functional Requirements
-- **Security:** Implemented authentication measures to safeguard API endpoints.
-- **Performance Optimization:** Enhanced query performance for faster response times.
-- **Error Handling:** Comprehensive logging and error handling mechanisms in place.
-```
+## Supported Operators
+
+- **Comparison:** `>`, `<`, `>=`, `<=`, `==`, `!=`
+- **Logical:** `AND`, `OR`
+- **String:** `contains`, `startswith`, `endswith`
+
+## Error Handling
+
+Comprehensive error handling is provided for:
+
+- Invalid rule syntax
+- Non-existent rules
+- Invalid data types
+- Database errors
+- Network issues
